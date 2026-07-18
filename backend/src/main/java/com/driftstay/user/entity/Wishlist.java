@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "wishlist",
         uniqueConstraints = @UniqueConstraint(name = "uk_wishlist_user_property", columnNames = {"user_id", "property_id"}),
@@ -28,4 +30,16 @@ public class Wishlist extends BaseEntity {
 
     @Column(name = "property_id", nullable = false)
     private Long propertyId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Wishlist wishlist)) return false;
+        return id != null && id.equals(wishlist.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

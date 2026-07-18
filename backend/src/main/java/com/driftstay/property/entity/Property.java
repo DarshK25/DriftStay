@@ -8,11 +8,15 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "property",
         indexes = {
+                @Index(name = "idx_property_public_id", columnList = "public_id", unique = true),
                 @Index(name = "idx_property_slug", columnList = "slug", unique = true),
                 @Index(name = "idx_property_city", columnList = "city"),
                 @Index(name = "idx_property_status", columnList = "status"),
@@ -28,6 +32,9 @@ public class Property extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "property_id")
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, length = 26)
+    private String publicId;
 
     @Column(nullable = false, unique = true, length = 255)
     private String slug;
@@ -56,6 +63,9 @@ public class Property extends BaseEntity {
 
     @Column(name = "address_line_2", length = 255)
     private String addressLine2;
+
+    @Column(length = 255)
+    private String landmark;
 
     @Column(nullable = false, length = 100)
     private String city;
@@ -97,5 +107,12 @@ public class Property extends BaseEntity {
     private List<PropertyContact> contacts = new ArrayList<>();
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PropertyAmenity> propertyAmenities = new ArrayList<>();
+    private Set<PropertyAmenity> propertyAmenities = new HashSet<>();
+
+    @PrePersist
+    void generatePublicId() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID().toString().replace("-", "").substring(0, 26);
+        }
+    }
 }

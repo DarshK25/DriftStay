@@ -2,6 +2,7 @@ package com.driftstay.notification.entity;
 
 import com.driftstay.common.BaseEntity;
 import com.driftstay.common.enums.NotificationChannel;
+import com.driftstay.common.enums.NotificationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,12 +40,16 @@ public class Notification extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String recipient;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private NotificationStatus status;
 
     @Column(name = "scheduled_at")
     private LocalDateTime scheduledAt;
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
+
+    @Column(name = "rendered_body", columnDefinition = "TEXT")
+    private String renderedBody;
 }

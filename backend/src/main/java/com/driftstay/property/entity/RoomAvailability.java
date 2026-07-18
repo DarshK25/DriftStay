@@ -1,6 +1,7 @@
 package com.driftstay.property.entity;
 
 import com.driftstay.common.BaseEntity;
+import com.driftstay.common.enums.AvailabilityStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,8 +36,9 @@ public class RoomAvailability extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status; // AVAILABLE, BLOCKED, MAINTENANCE, RESERVED
+    private AvailabilityStatus status;
 
     @Column(length = 255)
     private String reason;

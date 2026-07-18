@@ -11,10 +11,12 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "booking",
         indexes = {
+                @Index(name = "idx_booking_public_id", columnList = "public_id", unique = true),
                 @Index(name = "idx_booking_ref", columnList = "booking_reference", unique = true),
                 @Index(name = "idx_booking_user", columnList = "user_id"),
                 @Index(name = "idx_booking_property", columnList = "property_id"),
@@ -30,6 +32,9 @@ public class Booking extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, length = 26)
+    private String publicId;
 
     @Column(name = "booking_reference", nullable = false, unique = true, length = 20)
     private String bookingReference;
@@ -71,6 +76,25 @@ public class Booking extends BaseEntity {
     @Column(name = "special_requests", columnDefinition = "TEXT")
     private String specialRequests;
 
-    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    @Column(name = "base_price_snapshot", precision = 12, scale = 2)
+    private BigDecimal basePriceSnapshot;
+
+    @Column(name = "cleaning_fee_snapshot", precision = 12, scale = 2)
+    private BigDecimal cleaningFeeSnapshot;
+
+    @Column(name = "tax_snapshot", precision = 12, scale = 2)
+    private BigDecimal taxSnapshot;
+
+    @Column(name = "discount_snapshot", precision = 12, scale = 2)
+    private BigDecimal discountSnapshot;
+
+    @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
+
+    @PrePersist
+    void generatePublicId() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID().toString().replace("-", "").substring(0, 26);
+        }
+    }
 }
