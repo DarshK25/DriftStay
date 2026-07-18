@@ -1,4 +1,4 @@
-package com.driftstay.property.entity;
+package com.driftstay.room.entity;
 
 import com.driftstay.common.BaseEntity;
 import jakarta.persistence.*;
