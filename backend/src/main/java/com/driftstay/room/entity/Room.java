@@ -1,7 +1,8 @@
-package com.driftstay.property.entity;
+package com.driftstay.room.entity;
 
 import com.driftstay.common.BaseEntity;
 import com.driftstay.common.enums.RoomStatus;
+import com.driftstay.property.entity.Property;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
