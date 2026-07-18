@@ -8,10 +8,14 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "\"user\"", indexes = {
+        @Index(name = "idx_user_public_id", columnList = "public_id", unique = true),
         @Index(name = "idx_user_email", columnList = "email", unique = true),
         @Index(name = "idx_user_phone", columnList = "phone"),
         @Index(name = "idx_user_status", columnList = "status")
@@ -24,6 +28,9 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, length = 26)
+    private String publicId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -66,14 +73,24 @@ public class User extends BaseEntity {
                     @Index(name = "idx_user_role_role", columnList = "role_id")
             }
     )
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Wishlist> wishlist = new ArrayList<>();
+    private Set<Wishlist> wishlist = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserActivity> activities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SearchHistory> searchHistories = new ArrayList<>();
+
+    @PrePersist
+    void generatePublicId() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID().toString().replace("-", "").substring(0, 26);
+        }
+    }
 }

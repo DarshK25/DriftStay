@@ -1,6 +1,7 @@
 package com.driftstay.booking.entity;
 
 import com.driftstay.common.BaseEntity;
+import com.driftstay.common.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,7 @@ public class PaymentTransaction extends BaseEntity {
     @Column(name = "gateway_response", columnDefinition = "TEXT")
     private String gatewayResponse;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private TransactionStatus status;
 }

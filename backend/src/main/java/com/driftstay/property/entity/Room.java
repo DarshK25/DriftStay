@@ -9,10 +9,12 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "room",
         indexes = {
+                @Index(name = "idx_room_public_id", columnList = "public_id", unique = true),
                 @Index(name = "idx_room_property_status", columnList = "property_id,status"),
                 @Index(name = "uk_room_property_number", columnList = "property_id,room_number", unique = true)
         }
@@ -25,6 +27,9 @@ public class Room extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, length = 26)
+    private String publicId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
@@ -54,16 +59,16 @@ public class Room extends BaseEntity {
     @Column(name = "bathroom_count")
     private Integer bathroomCount;
 
-    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal basePrice;
 
-    @Column(name = "weekend_price", precision = 10, scale = 2)
+    @Column(name = "weekend_price", precision = 12, scale = 2)
     private BigDecimal weekendPrice;
 
-    @Column(name = "cleaning_fee", precision = 10, scale = 2)
+    @Column(name = "cleaning_fee", precision = 12, scale = 2)
     private BigDecimal cleaningFee;
 
-    @Column(name = "extra_guest_fee", precision = 10, scale = 2)
+    @Column(name = "extra_guest_fee", precision = 12, scale = 2)
     private BigDecimal extraGuestFee;
 
     @Column(name = "area_sqft")
@@ -81,4 +86,11 @@ public class Room extends BaseEntity {
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomAvailability> availabilities = new ArrayList<>();
+
+    @PrePersist
+    void generatePublicId() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID().toString().replace("-", "").substring(0, 26);
+        }
+    }
 }

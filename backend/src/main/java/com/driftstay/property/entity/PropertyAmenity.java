@@ -1,8 +1,11 @@
 package com.driftstay.property.entity;
 
+import com.driftstay.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "property_amenity",
@@ -14,7 +17,7 @@ import lombok.Setter;
 )
 @Getter
 @Setter
-public class PropertyAmenity {
+public class PropertyAmenity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +30,16 @@ public class PropertyAmenity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "amenity_id", nullable = false)
     private Amenity amenity;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PropertyAmenity that)) return false;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -1,6 +1,7 @@
 package com.driftstay.booking.entity;
 
 import com.driftstay.common.BaseEntity;
+import com.driftstay.common.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,7 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
     @Column(nullable = false, length = 3)
@@ -40,11 +41,18 @@ public class Payment extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String provider;
 
+    @Column(name = "provider_payment_id", length = 255)
+    private String providerPaymentId;
+
+    @Column(name = "provider_order_id", length = 255)
+    private String providerOrderId;
+
     @Column(name = "transaction_reference", length = 255)
     private String transactionReference;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private TransactionStatus status;
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;

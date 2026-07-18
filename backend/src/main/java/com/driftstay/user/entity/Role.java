@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "role", indexes = {
         @Index(name = "idx_role_name", columnList = "name", unique = true)
@@ -22,4 +24,16 @@ public class Role {
 
     @Column(length = 255)
     private String description;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Role role)) return false;
+        return id != null && id.equals(role.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

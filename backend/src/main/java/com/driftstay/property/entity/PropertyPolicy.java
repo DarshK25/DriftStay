@@ -30,6 +30,18 @@ public class PropertyPolicy extends BaseEntity {
     @Column(name = "check_out_time", nullable = false)
     private LocalTime checkOutTime;
 
+    @Column(name = "quiet_hours_start")
+    private LocalTime quietHoursStart;
+
+    @Column(name = "quiet_hours_end")
+    private LocalTime quietHoursEnd;
+
+    @Column(name = "no_parties")
+    private Boolean noParties = false;
+
+    @Column(name = "visitors_allowed")
+    private Boolean visitorsAllowed = true;
+
     @Column(name = "pets_allowed")
     private Boolean petsAllowed = false;
 

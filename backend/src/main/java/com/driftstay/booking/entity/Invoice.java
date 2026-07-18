@@ -1,6 +1,7 @@
 package com.driftstay.booking.entity;
 
 import com.driftstay.common.BaseEntity;
+import com.driftstay.common.enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,20 +35,21 @@ public class Invoice extends BaseEntity {
     @Column(name = "pdf_url", length = 500)
     private String pdfUrl;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
 
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 12, scale = 2)
     private BigDecimal tax;
 
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 12, scale = 2)
     private BigDecimal discount;
 
-    @Column(name = "grand_total", nullable = false, precision = 10, scale = 2)
+    @Column(name = "grand_total", nullable = false, precision = 12, scale = 2)
     private BigDecimal grandTotal;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private InvoiceStatus status;
 
     @Column(name = "issued_at")
     private LocalDateTime issuedAt;

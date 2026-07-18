@@ -28,6 +28,9 @@ public class RoomImage extends BaseEntity {
     @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
 
+    @Column(name = "alt_text", length = 255)
+    private String altText;
+
     @Column(length = 255)
     private String caption;
 

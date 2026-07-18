@@ -1,6 +1,7 @@
 package com.driftstay.notification.entity;
 
 import com.driftstay.common.BaseEntity;
+import com.driftstay.common.enums.NotificationLogStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,7 @@ public class NotificationLog extends BaseEntity {
     @Column(name = "provider_response", columnDefinition = "TEXT")
     private String providerResponse;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private NotificationLogStatus status;
 }

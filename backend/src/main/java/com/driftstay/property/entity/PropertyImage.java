@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "property_image",
         indexes = {
@@ -29,6 +27,9 @@ public class PropertyImage extends BaseEntity {
 
     @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
+
+    @Column(name = "alt_text", length = 255)
+    private String altText;
 
     @Column(length = 255)
     private String caption;

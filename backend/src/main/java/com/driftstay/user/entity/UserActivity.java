@@ -36,6 +36,9 @@ public class UserActivity extends BaseEntity {
     @Column(name = "entity_id")
     private Long entityId;
 
+    @Column(columnDefinition = "TEXT")
+    private String metadata;
+
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
