@@ -14,12 +14,12 @@ spring:
       validation-timeout: 5000
       leak-detection-threshold: 60000
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
   flyway:
     enabled: true
@@ -47,7 +47,7 @@ server:
 logging:
   level:
     com.driftstay: DEBUG
-    org.springframework.security: INFO
+    org.springframework.security: WARN
     org.hibernate.SQL: WARN
 
 springdoc:
