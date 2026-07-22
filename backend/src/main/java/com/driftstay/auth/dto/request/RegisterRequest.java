@@ -1,5 +1,7 @@
 package com.driftstay.auth.dto.request;
 
+import com.driftstay.auth.validator.PasswordStrength;
+import com.driftstay.auth.validator.PhoneNumber;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,7 +15,7 @@ public class RegisterRequest {
     @NotBlank @Email
     private String email;
 
-    @NotBlank @Size(min = 8, max = 100)
+    @NotBlank @PasswordStrength
     private String password;
 
     @NotBlank @Size(max = 100)
@@ -22,5 +24,6 @@ public class RegisterRequest {
     @NotBlank @Size(max = 100)
     private String lastName;
 
+    @PhoneNumber
     private String phone;
 }

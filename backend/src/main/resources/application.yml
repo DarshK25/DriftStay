@@ -5,14 +5,14 @@ spring:
     url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
   hikari:
-      pool-name: DriftStayPool
-      minimum-idle: 5
-      maximum-pool-size: 20
-      idle-timeout: 300000
-      max-lifetime: 1800000
-      connection-timeout: 30000
-      validation-timeout: 5000
-      leak-detection-threshold: 60000
+    pool-name: DriftStayPool
+    minimum-idle: 5
+    maximum-pool-size: 20
+    idle-timeout: 300000
+    max-lifetime: 1800000
+    connection-timeout: 30000
+    validation-timeout: 5000
+    leak-detection-threshold: 60000
   jpa:
     open-in-view: false
     hibernate:
@@ -31,13 +31,25 @@ spring:
       port: ${REDIS_PORT:6379}
   jackson:
     default-property-inclusion: non_null
-  
+  task:
+    scheduling:
+      pool:
+        size: 5
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
-
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    prometheus:
+      enabled: true
 
 server:
   port: 8000
@@ -49,6 +61,9 @@ logging:
     com.driftstay: DEBUG
     org.springframework.security: WARN
     org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{traceId}] [%thread] %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{traceId}] [%thread] %logger{36} - %msg%n"
 
 springdoc:
   api-docs:
@@ -59,6 +74,6 @@ springdoc:
 
 jwt:
   secret: ${JWT_SECRET}
-  access-token-expiration: 900000 #900000 ms=15 minutes
-  refresh-token-expiration: 2592000000 #2592000000 ms=30 days
+  access-token-expiration: 900000
+  refresh-token-expiration: 2592000000
   issuer: driftstay

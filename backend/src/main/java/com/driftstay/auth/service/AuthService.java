@@ -16,6 +16,7 @@ import com.driftstay.user.entity.User;
 import com.driftstay.user.repository.RoleRepository;
 import com.driftstay.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -40,6 +42,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
     private final AuthenticationManager authenticationManager;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final EmailVerificationService emailVerificationService;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
@@ -47,7 +51,7 @@ public class AuthService {
         }
 
         Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("Default role USER not found. Seed the roles table."));
+                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
         User user = new User();
         user.setEmail(request.getEmail().toLowerCase().trim());
@@ -56,10 +60,13 @@ public class AuthService {
         user.setLastName(request.getLastName().trim());
         user.setPhone(request.getPhone() != null ? request.getPhone().trim() : null);
         user.setStatus(UserStatus.ACTIVE);
-        user.setIsVerified(true);
+        user.setIsVerified(false);
         user.setRoles(new HashSet<>(Set.of(userRole)));
 
         user = userRepository.save(user);
+
+        String verificationToken = emailVerificationService.generateVerificationToken(user.getId());
+        log.info("Verification token for userId={}: {}", user.getId(), verificationToken);
 
         UserPrincipal principal = new UserPrincipal(user);
         String accessToken = jwtService.generateAccessToken(principal);
@@ -108,18 +115,32 @@ public class AuthService {
         User user = storedToken.getUser();
         UserPrincipal principal = new UserPrincipal(user);
         String accessToken = jwtService.generateAccessToken(principal);
-        String rawRefreshToken = createRefreshToken(user, null, null);
+        String rawRefreshToken = createRefreshToken(user, storedToken.getDeviceName(), storedToken.getDeviceType());
 
         return buildAuthResponse(accessToken, rawRefreshToken);
     }
 
     public void logout(RefreshTokenRequest request) {
         String tokenHash = jwtService.hashToken(request.getRefreshToken());
-        refreshTokenRepository.findByTokenHash(tokenHash)
-                .ifPresent(token -> {
-                    token.setRevoked(true);
-                    refreshTokenRepository.save(token);
-                });
+        refreshTokenRepository.findByTokenHash(tokenHash).ifPresent(token -> {
+            token.setRevoked(true);
+            refreshTokenRepository.save(token);
+            log.info("User {} logged out, refresh token revoked", token.getUser().getId());
+        });
+    }
+
+    public void logoutAll(String userEmail) {
+        User user = userRepository.findByEmailIgnoreCaseAndStatus(userEmail, UserStatus.ACTIVE)
+                .orElseThrow(() -> new InvalidTokenException("User not found"));
+
+        refreshTokenRepository.deleteByUserId(user.getId());
+        log.info("All sessions revoked for userId={}", user.getId());
+    }
+
+    public long getActiveSessions(String userEmail) {
+        User user = userRepository.findByEmailIgnoreCaseAndStatus(userEmail, UserStatus.ACTIVE)
+                .orElseThrow(() -> new InvalidTokenException("User not found"));
+        return refreshTokenRepository.countByUserId(user.getId());
     }
 
     private String createRefreshToken(User user, String deviceName, String deviceType) {

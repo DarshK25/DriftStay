@@ -1,7 +1,9 @@
 package com.driftstay.auth.exception;
 
-public class EmailAlreadyExistsException extends RuntimeException {
+import com.driftstay.common.exception.ConflictException;
+
+public class EmailAlreadyExistsException extends ConflictException {
     public EmailAlreadyExistsException(String email) {
-        super("Email already registered: " + email);
+        super("EMAIL_EXISTS", "Email already registered: " + email);
     }
 }
