@@ -2,6 +2,7 @@ package com.driftstay.auth.dto.request;
 
 import com.driftstay.auth.validator.PasswordStrength;
 import com.driftstay.auth.validator.PhoneNumber;
+import com.driftstay.common.validation.CreateValidation;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -12,16 +13,16 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
 
-    @NotBlank @Email
+    @NotBlank(groups = CreateValidation.class) @Email(groups = CreateValidation.class)
     private String email;
 
-    @NotBlank @PasswordStrength
+    @NotBlank(groups = CreateValidation.class) @PasswordStrength
     private String password;
 
-    @NotBlank @Size(max = 100)
+    @NotBlank(groups = CreateValidation.class) @Size(max = 100, groups = CreateValidation.class)
     private String firstName;
 
-    @NotBlank @Size(max = 100)
+    @NotBlank(groups = CreateValidation.class) @Size(max = 100, groups = CreateValidation.class)
     private String lastName;
 
     @PhoneNumber

@@ -1,5 +1,6 @@
 package com.driftstay.property.dto.request;
 
+import com.driftstay.common.validation.CreateValidation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,28 +11,28 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class PropertyCreateRequest {
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String name;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String slug;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String propertyType;
     private String shortDescription;
     private String description;
     private Integer starCategory;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String addressLine1;
     private String addressLine2;
     private String landmark;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String city;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String state;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String country;
     private String postalCode;
     private BigDecimal latitude;
     private BigDecimal longitude;
-    @NotNull
+    @NotNull(groups = CreateValidation.class)
     private String status;
 }

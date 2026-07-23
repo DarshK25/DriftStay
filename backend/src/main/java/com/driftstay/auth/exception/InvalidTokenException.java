@@ -1,14 +1,10 @@
 package com.driftstay.auth.exception;
 
-import com.driftstay.common.exception.UnauthorizedException;
+import com.driftstay.common.exception.BusinessException;
+import com.driftstay.common.exception.ErrorCode;
 
-public class InvalidTokenException extends UnauthorizedException {
+public class InvalidTokenException extends BusinessException {
     public InvalidTokenException(String message) {
-        super("INVALID_TOKEN", message);
-    }
-
-    public InvalidTokenException(String message, Throwable cause) {
-        super("INVALID_TOKEN", message);
-        initCause(cause);
+        super(ErrorCode.INVALID_TOKEN, message);
     }
 }

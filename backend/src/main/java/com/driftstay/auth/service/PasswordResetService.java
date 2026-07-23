@@ -34,7 +34,7 @@ public class PasswordResetService {
     @Transactional
     public void requestReset(String email) {
         User user = userRepository.findByEmailIgnoreCaseAndStatus(email, UserStatus.ACTIVE)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         String rawToken = generateSecureToken();
         String tokenHash = hashToken(rawToken);
@@ -56,7 +56,7 @@ public class PasswordResetService {
         }
 
         User user = userRepository.findById(resetToken.userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", resetToken.userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + resetToken.userId));
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);

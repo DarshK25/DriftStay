@@ -1,10 +1,10 @@
 package com.driftstay.common.exception;
 
+import com.driftstay.common.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.Instant;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -21,68 +20,49 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public ProblemDetail handleBusiness(BusinessException ex, HttpServletRequest request) {
-        log.warn("Business exception: {} - {}", ex.getCode(), ex.getMessage());
-        ProblemDetail detail = ex.toProblemDetail();
-        enrich(detail, request);
-        return detail;
+    public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException ex) {
+        log.warn("Business exception: {} - {}", ex.getErrorCode(), ex.getMessage());
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(ApiResponse.error(ex.getErrorCode().name(), ex.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ProblemDetail handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Invalid email or password");
-        detail.setTitle("Unauthorized");
-        detail.setProperty("code", "INVALID_CREDENTIALS");
-        enrich(detail, request);
-        return detail;
+    public ResponseEntity<ApiResponse<Void>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS.name(), "Invalid email or password"));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ProblemDetail handleUserNotFound(UsernameNotFoundException ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        detail.setTitle("Not Found");
-        detail.setProperty("code", "USER_NOT_FOUND");
-        enrich(detail, request);
-        return detail;
+    public ResponseEntity<ApiResponse<Void>> handleUserNotFound(UsernameNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ErrorCode.USER_NOT_FOUND.name(), ex.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ProblemDetail handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Access denied");
-        detail.setTitle("Forbidden");
-        detail.setProperty("code", "FORBIDDEN");
-        enrich(detail, request);
-        return detail;
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ErrorCode.FORBIDDEN.name(), "Access denied"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
-        detail.setTitle("Bad Request");
-        detail.setProperty("code", "VALIDATION_ERROR");
-        enrich(detail, request);
-        return detail;
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ErrorCode.VALIDATION_ERROR.name(), message));
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneric(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
         log.error("Unhandled exception", ex);
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
-        detail.setTitle("Internal Server Error");
-        detail.setProperty("code", "INTERNAL_ERROR");
-        enrich(detail, request);
-        return detail;
-    }
-
-    private void enrich(ProblemDetail detail, HttpServletRequest request) {
-        detail.setProperty("timestamp", Instant.now().toString());
-        detail.setProperty("path", request.getRequestURI());
-        String traceId = MDC.get("traceId");
-        if (traceId != null) {
-            detail.setProperty("traceId", traceId);
-        }
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(ErrorCode.INTERNAL_ERROR.name(), "An unexpected error occurred"));
     }
 }

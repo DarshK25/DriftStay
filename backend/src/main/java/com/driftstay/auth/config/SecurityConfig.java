@@ -4,6 +4,7 @@ import com.driftstay.auth.security.BruteForceProtectionFilter;
 import com.driftstay.auth.security.JwtAuthenticationFilter;
 import com.driftstay.auth.security.RateLimitingFilter;
 import com.driftstay.auth.service.CustomUserDetailsService;
+import com.driftstay.common.constants.SecurityConstants;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -49,14 +50,8 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/v*/auth/register", "/v*/auth/login",
-                        "/v*/auth/refresh", "/v*/auth/forgot-password",
-                        "/v*/auth/reset-password", "/v*/auth/verify-email").permitAll()
-                .requestMatchers(HttpMethod.GET, "/actuator/health",
-                        "/actuator/info").permitAll()
+                .requestMatchers(SecurityConstants.PUBLIC_ENDPOINTS).permitAll()
                 .requestMatchers("/actuator/prometheus").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
-                        "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
@@ -91,8 +86,7 @@ public class SecurityConfig {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(
-                "{\"code\":\"UNAUTHORIZED\",\"message\":\"" +
-                authException.getMessage() + "\"}");
+                "{\"success\":false,\"message\":\"Authentication required\",\"errorCode\":\"UNAUTHORIZED\"}");
         };
     }
 
@@ -102,7 +96,7 @@ public class SecurityConfig {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write(
-                "{\"code\":\"FORBIDDEN\",\"message\":\"Access denied\"}");
+                "{\"success\":false,\"message\":\"Access denied\",\"errorCode\":\"FORBIDDEN\"}");
         };
     }
 

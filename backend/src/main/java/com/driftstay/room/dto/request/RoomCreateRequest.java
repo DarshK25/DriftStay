@@ -1,5 +1,6 @@
 package com.driftstay.room.dto.request;
 
+import com.driftstay.common.validation.CreateValidation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,26 +11,26 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class RoomCreateRequest {
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String roomName;
     private String roomNumber;
     private String description;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String roomType;
-    @NotNull
+    @NotNull(groups = CreateValidation.class)
     private Integer capacity;
-    @NotNull
+    @NotNull(groups = CreateValidation.class)
     private Integer bedCount;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String bedType;
     private Integer bathroomCount;
-    @NotNull
+    @NotNull(groups = CreateValidation.class)
     private BigDecimal basePrice;
     private BigDecimal weekendPrice;
     private BigDecimal cleaningFee;
     private BigDecimal extraGuestFee;
     private Integer areaSqft;
     private Integer floorNumber;
-    @NotBlank
+    @NotBlank(groups = CreateValidation.class)
     private String status;
 }

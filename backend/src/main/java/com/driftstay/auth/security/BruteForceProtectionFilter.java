@@ -41,7 +41,7 @@ public class BruteForceProtectionFilter extends OncePerRequestFilter {
             response.setStatus(429);
             response.setContentType("application/json");
             response.getWriter().write(
-                "{\"code\":\"TOO_MANY_ATTEMPTS\",\"message\":\"Too many login attempts. Try again in 15 minutes.\"}");
+                "{\"success\":false,\"message\":\"Too many login attempts. Try again in 15 minutes.\",\"errorCode\":\"TOO_MANY_ATTEMPTS\"}");
             return;
         }
 
