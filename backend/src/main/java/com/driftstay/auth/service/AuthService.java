@@ -10,6 +10,7 @@ import com.driftstay.auth.exception.InvalidTokenException;
 import com.driftstay.auth.repository.RefreshTokenRepository;
 import com.driftstay.config.JwtProperties;
 import com.driftstay.common.enums.UserStatus;
+import com.driftstay.common.exception.ResourceNotFoundException;
 import com.driftstay.user.entity.RefreshToken;
 import com.driftstay.user.entity.Role;
 import com.driftstay.user.entity.User;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -168,5 +170,10 @@ public class AuthService {
                 .tokenType("Bearer")
                 .expiresIn(Long.parseLong(jwtProperties.getAccessTokenExpiration()))
                 .build();
+    }
+
+    public User getCurrentUser(UserDetails userDetails) {
+        return userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }
