@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "refresh_token", indexes = {
         @Index(name = "idx_refresh_token_user", columnList = "user_id"),
         @Index(name = "idx_refresh_token_expires", columnList = "expires_at"),
-        @Index(name = "idx_refresh_token_revoked", columnList = "revoked")
+        @Index(name = "idx_refresh_token_revoked", columnList = "revoked"),
+        @Index(name = "idx_refresh_token_hash", columnList = "token_hash")
 })
 @Getter
 @Setter
